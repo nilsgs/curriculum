@@ -1,7 +1,13 @@
 {
   "version": "0.3.0",
   "skills": [
-    { "name": "curriculum" }
+    {
+      "name": "curriculum"
+    }
   ],
-  "dependencies": []
+  "dependencies": [
+    {
+      "name": "smoko"
+    }
+  ]
 }

@@ -32,3 +32,19 @@ Feature: cur install saves dependency to .curriculum
     When I run "sh -c 'cur install dummy-skill --no-save && cur install'"
     Then exit code is 0
     Then output contains "No dependencies declared in .curriculum"
+
+  Scenario: no-argument install installs all declared dependencies
+    Given a file ".curriculum" with content:
+      {
+        "version": "0.1.0",
+        "skills": [],
+        "dependencies": [{"name": "dummy-skill", "version": "1.0.0"}]
+      }
+    When I run "cur install"
+    Then exit code is 0
+    Then the directory ".agents/skills/dummy-skill" exists
+
+  Scenario: fails when the skill is not in the repository
+    When I run "cur install nonexistent-skill"
+    Then exit code is not 0
+    Then stderr contains "not found in repository"

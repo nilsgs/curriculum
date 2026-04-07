@@ -1,0 +1,59 @@
+Feature: cur push copies skills to the central repository
+  `cur push` reads the skills declared in .curriculum and copies them to
+  ~/.curriculum/repository/<name>/<version>/. Without arguments, all
+  declared skills are pushed; with a name, only that skill is pushed.
+
+  Image: curriculum-test:latest
+
+  Background:
+    Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
+    Given a file ".curriculum" with content:
+      {
+        "version": "1.0.0",
+        "skills": [{"name": "my-skill"}],
+        "dependencies": []
+      }
+    Given a file "skills/my-skill/SKILL.md" with content:
+      ---
+      name: my-skill
+      description: "A test skill"
+      ---
+
+  Scenario: pushes all declared skills to the repository
+    When I run "cur push"
+    Then exit code is 0
+    Then the directory "ch/repository/my-skill/1.0.0" exists
+    Then file "ch/repository/my-skill/1.0.0/SKILL.md" exists
+
+  Scenario: named push copies only that skill
+    Given a file ".curriculum" with content:
+      {
+        "version": "1.0.0",
+        "skills": [{"name": "my-skill"}, {"name": "other-skill"}],
+        "dependencies": []
+      }
+    Given a file "skills/other-skill/SKILL.md" with content:
+      ---
+      name: other-skill
+      description: "Another test skill"
+      ---
+    When I run "cur push my-skill"
+    Then exit code is 0
+    Then the directory "ch/repository/my-skill/1.0.0" exists
+    Then the directory "ch/repository/other-skill/1.0.0" does not exist
+
+  Scenario: fails when no skills are declared in .curriculum
+    Given a file ".curriculum" with content:
+      {
+        "version": "1.0.0",
+        "skills": [],
+        "dependencies": []
+      }
+    When I run "cur push"
+    Then exit code is not 0
+    Then stderr contains "no skills declared"
+
+  Scenario: fails when the named skill is not in the manifest
+    When I run "cur push nonexistent-skill"
+    Then exit code is not 0
+    Then stderr contains "not found"

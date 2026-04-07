@@ -1,0 +1,40 @@
+Feature: cur list shows skills in the central repository
+  `cur list` prints all skills and their versions from
+  ~/.curriculum/repository/. The latest version is marked with *.
+
+  Image: curriculum-test:latest
+
+  Background:
+    Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
+
+  Scenario: shows available skills
+    Given a file "ch/repository/my-skill/1.0.0/SKILL.md" with content:
+      ---
+      name: my-skill
+      description: "A test skill"
+      ---
+    When I run "cur list"
+    Then exit code is 0
+    Then output contains "my-skill"
+    Then output contains "1.0.0"
+
+  Scenario: marks the latest version with *
+    Given a file "ch/repository/my-skill/1.0.0/SKILL.md" with content:
+      ---
+      name: my-skill
+      description: "A test skill"
+      ---
+    Given a file "ch/repository/my-skill/2.0.0/SKILL.md" with content:
+      ---
+      name: my-skill
+      description: "A test skill"
+      ---
+    When I run "cur list"
+    Then exit code is 0
+    Then output contains "2.0.0 *"
+    Then output does not contain "1.0.0 *"
+
+  Scenario: shows message when repository is empty
+    When I run "cur list"
+    Then exit code is 0
+    Then output contains "No skills in repository"

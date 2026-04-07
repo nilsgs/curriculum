@@ -1,0 +1,21 @@
+Feature: cur init creates a .curriculum manifest
+  `cur init` writes a fresh .curriculum file in the current directory.
+  It fails if one already exists.
+
+  Image: curriculum-test:latest
+
+  Scenario: creates .curriculum with default content
+    When I run "cur init"
+    Then exit code is 0
+    Then output contains "Initialized"
+    Then file ".curriculum" exists
+    Then file ".curriculum" contains "\"version\": \"0.1.0\""
+    Then file ".curriculum" contains "\"skills\": []"
+    Then file ".curriculum" contains "\"dependencies\": []"
+
+  Scenario: fails when .curriculum already exists
+    Given a file ".curriculum" with content:
+      {}
+    When I run "cur init"
+    Then exit code is not 0
+    Then stderr contains "already initialized"
