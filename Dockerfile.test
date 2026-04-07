@@ -1,0 +1,8 @@
+FROM golang:1.26 AS builder
+WORKDIR /build
+COPY src/ .
+RUN go build -o /usr/local/bin/cur .
+
+FROM debian:bookworm-slim
+COPY --from=builder /usr/local/bin/cur /usr/local/bin/cur
+WORKDIR /smoko-work

@@ -182,8 +182,8 @@ cur install my-skill@1.0.0
 # Install to personal skills (~/.agents/skills/ instead of .agents/skills/)
 cur install my-skill --global
 
-# Add/update the dependency in .curriculum
-cur install my-skill --save
+# Install without updating .curriculum
+cur install my-skill --no-save
 ```
 
 **Behavior:**
@@ -191,7 +191,7 @@ cur install my-skill --save
 - With `<name>`: installs from central repo
 - With `@version`: installs that specific semver (if omitted, installs latest)
 - `--global`: installs to `~/.agents/skills/` instead of `.agents/skills/`
-- `--save`: updates `.curriculum` `dependencies[]` with the installed skill + version
+- `--no-save`: skips updating `.curriculum` `dependencies[]`
 
 ---
 
@@ -396,8 +396,8 @@ cur push
 cd another-project
 cur init
 
-# Install the latest version
-cur install python-testing --save
+# Install the latest version — also saved to .curriculum automatically
+cur install python-testing
 # → Installed to .agents/skills/python-testing/
 # → Added to .curriculum dependencies
 
@@ -418,11 +418,11 @@ cur install python-testing --global
 
 ```bash
 # Install a specific version
-cur install python-testing@1.0.0 --save
+cur install python-testing@1.0.0
 # → .curriculum dependency: { "name": "python-testing", "version": "1.0.0" }
 
 # Install latest of a different skill
-cur install another-skill --save
+cur install another-skill
 # → .curriculum dependency: { "name": "another-skill" }
 # → Resolves to highest available version at install time
 ```

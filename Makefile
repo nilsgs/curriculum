@@ -4,7 +4,7 @@ VERSION = $(shell cat VERSION)
 COMMIT  = $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 LDFLAGS = -s -w -X curriculum/cmd.version=$(VERSION) -X curriculum/cmd.commit=$(COMMIT)
 
-.PHONY: build install cross clean test test-local
+.PHONY: build install cross clean test test-local test-smoko build-test-image
 
 build:
 	cd $(SRC) && go build -ldflags "$(LDFLAGS)" -o ../$(BINARY).exe .
@@ -29,3 +29,9 @@ test:
 
 test-local:
 	cd $(SRC) && go test ./... -v -count=1
+
+build-test-image:
+	docker build -f Dockerfile.test -t curriculum-test:latest .
+
+test-smoko: build-test-image
+	smoko run specs/

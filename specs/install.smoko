@@ -1,0 +1,34 @@
+Feature: cur install saves dependency to .curriculum
+  By default, `cur install <name>` records the skill as a dependency in
+  .curriculum so the project is reproducible with `cur install` (no args).
+
+  Image: curriculum-test:latest
+
+  Background:
+    Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
+    Given a file "ch/repository/dummy-skill/1.0.0/SKILL.md" with content:
+      ---
+      name: dummy-skill
+      description: "A dummy skill used in tests"
+      ---
+    Given a file ".curriculum" with content:
+      {
+        "version": "0.1.0",
+        "skills": [],
+        "dependencies": []
+      }
+
+  Scenario: named install saves dependency to .curriculum by default
+    When I run "cur install dummy-skill"
+    Then exit code is 0
+    Then file ".curriculum" contains "dummy-skill"
+
+  Scenario: named install with explicit version pins that version in .curriculum
+    When I run "cur install dummy-skill@1.0.0"
+    Then exit code is 0
+    Then file ".curriculum" contains "1.0.0"
+
+  Scenario: --no-save skips updating .curriculum
+    When I run "sh -c 'cur install dummy-skill --no-save && cur install'"
+    Then exit code is 0
+    Then output contains "No dependencies declared in .curriculum"

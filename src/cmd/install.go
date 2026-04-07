@@ -19,15 +19,16 @@ func newInstallCmd() *cobra.Command {
 		Long: `Install skills from ~/.curriculum/repository/ into .agents/skills/.
 
 Without arguments, installs all dependencies declared in .curriculum.
-With a name (and optional @version), installs that single skill.
+With a name (and optional @version), installs that single skill and records it
+as a dependency in .curriculum.
 
 Use --global to install into ~/.agents/skills/ instead.
-Use --save to record the skill as a dependency in .curriculum.`,
+Use --no-save to skip updating .curriculum.`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: runInstall,
 	}
 	cmd.Flags().Bool("global", false, "install into ~/.agents/skills/ instead of .agents/skills/")
-	cmd.Flags().Bool("save", false, "add or update the dependency in .curriculum")
+	cmd.Flags().Bool("no-save", false, "do not add or update the dependency in .curriculum")
 	return cmd
 }
 
@@ -39,7 +40,8 @@ type installResult struct {
 
 func runInstall(cmd *cobra.Command, args []string) error {
 	global, _ := cmd.Flags().GetBool("global")
-	save, _ := cmd.Flags().GetBool("save")
+	noSave, _ := cmd.Flags().GetBool("no-save")
+	save := !noSave
 
 	destBase, err := resolveInstallBase(global)
 	if err != nil {
@@ -47,7 +49,7 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(args) == 0 {
-		return installAllDeps(cmd, destBase, global, save)
+		return installAllDeps(cmd, destBase, global, false)
 	}
 
 	nameArg, version := splitNameVersion(args[0])
@@ -56,7 +58,7 @@ func runInstall(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	// Resolve the version that was actually installed.
+	// Resolve the version that was actually installed (for display only).
 	resolvedVersion := version
 	if resolvedVersion == "" {
 		infos, _ := repository.List()
@@ -69,7 +71,8 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	}
 
 	if save {
-		if err := saveDepToManifest(nameArg, resolvedVersion); err != nil {
+		// Save the originally requested version (empty = float to latest).
+		if err := saveDepToManifest(nameArg, version); err != nil {
 			fmt.Fprintf(cmd.ErrOrStderr(), "warning: could not update %s: %v\n", manifest.FileName, err)
 		}
 	}
