@@ -1,0 +1,30 @@
+Feature: cur remove updates .curriculum by default
+  By default, `cur remove <name>` removes the dependency from .curriculum
+  so the manifest stays in sync. Use --no-save to skip the manifest update.
+
+  Image: curriculum-test:latest
+
+  Background:
+    Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
+    Given a file "ch/repository/dummy-skill/1.0.0/SKILL.md" with content:
+      ---
+      name: dummy-skill
+      description: "A dummy skill used in tests"
+      ---
+    Given a file ".curriculum" with content:
+      {
+        "version": "0.1.0",
+        "skills": [],
+        "dependencies": [{"name": "dummy-skill", "version": "1.0.0"}]
+      }
+    Given I run "cur install dummy-skill@1.0.0"
+
+  Scenario: remove deletes dependency from .curriculum by default
+    When I run "cur remove dummy-skill"
+    Then exit code is 0
+    Then file ".curriculum" does not contain "dummy-skill"
+
+  Scenario: --no-save keeps the dependency in .curriculum
+    When I run "cur remove dummy-skill --no-save"
+    Then exit code is 0
+    Then file ".curriculum" contains "dummy-skill"

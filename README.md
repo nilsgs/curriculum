@@ -91,8 +91,8 @@ Pushes all skills to `~/.curriculum/repository/my-skill/1.0.0/`.
 ```bash
 cd another-repo
 cur init
-cur install my-skill  # Installs from central repo into .agents/skills/my-skill/
-cur install my-skill --save  # Also adds to .curriculum dependencies
+cur install my-skill  # Installs and adds to .curriculum dependencies
+cur install my-skill --no-save  # Install without updating .curriculum
 ```
 
 ---
@@ -200,20 +200,20 @@ cur install my-skill --no-save
 Remove an installed skill.
 
 ```bash
-# Remove from repo-local .agents/skills/
+# Remove from repo-local .agents/skills/ and update .curriculum
 cur remove my-skill
 
 # Remove from personal ~/.agents/skills/
 cur remove my-skill --global
 
-# Also remove from .curriculum dependencies
-cur remove my-skill --save
+# Remove without updating .curriculum
+cur remove my-skill --no-save
 ```
 
 **Behavior:**
-- Deletes the skill directory
+- Deletes the skill directory and removes the entry from `.curriculum` `dependencies[]`
 - `--global`: removes from `~/.agents/skills/` instead of `.agents/skills/`
-- `--save`: also removes the entry from `.curriculum` `dependencies[]`
+- `--no-save`: skips updating `.curriculum` `dependencies[]`
 
 ---
 

@@ -20,19 +20,20 @@ func newRemoveCmd() *cobra.Command {
 		Long: `Remove a skill from .agents/skills/<name>.
 
 Use --global to remove from ~/.agents/skills/ instead.
-Use --save to also remove the skill from .curriculum dependencies.`,
+Use --no-save to skip removing the dependency from .curriculum.`,
 		Args: cobra.ExactArgs(1),
 		RunE: runRemove,
 	}
 	cmd.Flags().Bool("global", false, "remove from ~/.agents/skills/ instead of .agents/skills/")
-	cmd.Flags().Bool("save", false, "also remove the dependency from .curriculum")
+	cmd.Flags().Bool("no-save", false, "do not remove the dependency from .curriculum")
 	return cmd
 }
 
 func runRemove(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	global, _ := cmd.Flags().GetBool("global")
-	save, _ := cmd.Flags().GetBool("save")
+	noSave, _ := cmd.Flags().GetBool("no-save")
+	save := !noSave
 
 	var skillsBase string
 	if global {
