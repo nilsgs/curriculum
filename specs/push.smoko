@@ -37,8 +37,11 @@ Feature: cur push copies skills to the central repository
       name: other-skill
       description: "Another test skill"
       ---
-    When I run "cur push my-skill"
+    When I run "cur push my-skill --json"
     Then exit code is 0
+    Then output as JSON at path "$[0].name" equals "my-skill"
+    Then output as JSON at path "$[0].version" equals "1.0.0"
+    Then output as JSON at path "$[0].destination" equals "/smoko-work/ch/repository/my-skill/1.0.0"
     Then the directory "ch/repository/my-skill/1.0.0" exists
     Then the directory "ch/repository/other-skill/1.0.0" does not exist
 

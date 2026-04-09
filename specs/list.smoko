@@ -13,10 +13,12 @@ Feature: cur list shows skills in the central repository
       name: my-skill
       description: "A test skill"
       ---
-    When I run "cur list"
+    When I run "cur list --json"
     Then exit code is 0
-    Then output contains "my-skill"
-    Then output contains "1.0.0"
+    Then output as JSON at path "$[0].name" equals "my-skill"
+    Then output as JSON at path "$[0].versions" equals:
+      ["1.0.0"]
+    Then output as JSON at path "$[0].latest" equals "1.0.0"
 
   Scenario: marks the latest version with *
     Given a file "ch/repository/my-skill/1.0.0/SKILL.md" with content:
@@ -35,6 +37,6 @@ Feature: cur list shows skills in the central repository
     Then output does not contain "1.0.0 *"
 
   Scenario: shows message when repository is empty
-    When I run "cur list"
+    When I run "cur list --json"
     Then exit code is 0
-    Then output contains "No skills in repository"
+    Then output as JSON at path "$" equals null

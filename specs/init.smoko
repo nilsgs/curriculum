@@ -9,9 +9,17 @@ Feature: cur init creates a .curriculum manifest
     Then exit code is 0
     Then output contains "Initialized"
     Then file ".curriculum" exists
-    Then file ".curriculum" contains "\"version\": \"0.1.0\""
-    Then file ".curriculum" contains "\"skills\": []"
-    Then file ".curriculum" contains "\"dependencies\": []"
+    Then file ".curriculum" as JSON at path "$.version" equals "0.1.0"
+    Then file ".curriculum" as JSON at path "$.skills" equals:
+      []
+    Then file ".curriculum" as JSON at path "$.dependencies" equals:
+      []
+
+  Scenario: creates JSON output when requested
+    When I run "cur init --json"
+    Then exit code is 0
+    Then output as JSON at path "$.version" equals "0.1.0"
+    Then output as JSON at path "$.path" exists
 
   Scenario: fails when .curriculum already exists
     Given a file ".curriculum" with content:

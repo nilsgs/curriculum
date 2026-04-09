@@ -24,14 +24,18 @@ Feature: cur remove updates .curriculum by default
       ---
 
   Scenario: remove deletes dependency from .curriculum by default
-    When I run "cur remove dummy-skill"
+    When I run "cur remove dummy-skill --json"
     Then exit code is 0
-    Then file ".curriculum" does not contain "dummy-skill"
+    Then output as JSON at path "$.name" equals "dummy-skill"
+    Then output as JSON at path "$.status" equals "removed"
+    Then file ".curriculum" as JSON at path "$.dependencies" equals:
+      []
 
   Scenario: --no-save keeps the dependency in .curriculum
     When I run "cur remove dummy-skill --no-save"
     Then exit code is 0
-    Then file ".curriculum" contains "dummy-skill"
+    Then file ".curriculum" as JSON at path "$.dependencies[0].name" equals "dummy-skill"
+    Then file ".curriculum" as JSON at path "$.dependencies[0].version" equals "1.0.0"
 
   Scenario: fails when the skill is not installed
     When I run "cur remove nonexistent-skill"

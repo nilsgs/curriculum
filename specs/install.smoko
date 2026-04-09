@@ -19,19 +19,29 @@ Feature: cur install saves dependency to .curriculum
       }
 
   Scenario: named install saves dependency to .curriculum by default
-    When I run "cur install dummy-skill"
+    When I run "cur install dummy-skill --json"
     Then exit code is 0
-    Then file ".curriculum" contains "dummy-skill"
+    Then output as JSON at path "$.name" equals "dummy-skill"
+    Then output as JSON at path "$.version" equals "1.0.0"
+    Then output as JSON at path "$.destination" equals "/smoko-work/.agents/skills/dummy-skill"
+    Then file ".curriculum" as JSON at path "$.dependencies" equals:
+      [{"name":"dummy-skill"}]
 
   Scenario: named install with explicit version pins that version in .curriculum
-    When I run "cur install dummy-skill@1.0.0"
+    When I run "cur install dummy-skill@1.0.0 --json"
     Then exit code is 0
-    Then file ".curriculum" contains "1.0.0"
+    Then output as JSON at path "$.name" equals "dummy-skill"
+    Then output as JSON at path "$.version" equals "1.0.0"
+    Then output as JSON at path "$.destination" equals "/smoko-work/.agents/skills/dummy-skill"
+    Then file ".curriculum" as JSON at path "$.dependencies" equals:
+      [{"name":"dummy-skill","version":"1.0.0"}]
 
   Scenario: --no-save skips updating .curriculum
     When I run "sh -c 'cur install dummy-skill --no-save && cur install'"
     Then exit code is 0
     Then output contains "No dependencies declared in .curriculum"
+    Then file ".curriculum" as JSON at path "$.dependencies" equals:
+      []
 
   Scenario: no-argument install installs all declared dependencies
     Given a file ".curriculum" with content:
@@ -40,8 +50,11 @@ Feature: cur install saves dependency to .curriculum
         "skills": [],
         "dependencies": [{"name": "dummy-skill", "version": "1.0.0"}]
       }
-    When I run "cur install"
+    When I run "cur install --json"
     Then exit code is 0
+    Then output as JSON at path "$[0].name" equals "dummy-skill"
+    Then output as JSON at path "$[0].version" equals "1.0.0"
+    Then output as JSON at path "$[0].destination" equals "/smoko-work/.agents/skills/dummy-skill"
     Then the directory ".agents/skills/dummy-skill" exists
 
   Scenario: fails when the skill is not in the repository
