@@ -33,5 +33,5 @@ test-local:
 build-test-image:
 	docker build -f Dockerfile.test -t curriculum-test:latest .
 
-test-smoko: build-test-image
+test-smoko:
 	smoko run specs/

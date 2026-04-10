@@ -1,0 +1,3 @@
+image   = "curriculum-test:latest"
+build   = "docker build -f Dockerfile.test -t curriculum-test:latest ."
+timeout = 5

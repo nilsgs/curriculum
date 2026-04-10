@@ -2,8 +2,6 @@ Feature: cur list shows skills in the central repository
   `cur list` prints all skills and their versions from
   ~/.curriculum/repository/. The latest version is marked with *.
 
-  Image: curriculum-test:latest
-
   Background:
     Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
 

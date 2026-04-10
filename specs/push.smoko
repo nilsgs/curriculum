@@ -3,8 +3,6 @@ Feature: cur push copies skills to the central repository
   ~/.curriculum/repository/<name>/<version>/. Without arguments, all
   declared skills are pushed; with a name, only that skill is pushed.
 
-  Image: curriculum-test:latest
-
   Background:
     Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
     Given a file ".curriculum" with content:
@@ -58,5 +56,24 @@ Feature: cur push copies skills to the central repository
 
   Scenario: fails when the named skill is not in the manifest
     When I run "cur push nonexistent-skill"
-    Then exit code is not 0
+    Then exit code is 2
     Then stderr contains "not found"
+
+  Scenario: pushes a skill from a custom path declared in .curriculum
+    Given a file ".curriculum" with content:
+      {
+        "version": "1.0.0",
+        "skills": [{"name": "my-skill", "path": "agent-tools/my-skill"}],
+        "dependencies": []
+      }
+    Given a file "agent-tools/my-skill/SKILL.md" with content:
+      ---
+      name: my-skill
+      description: "A test skill"
+      ---
+    When I run "cur push --json"
+    Then exit code is 0
+    Then output as JSON at path "$[0].name" equals "my-skill"
+    Then output as JSON at path "$[0].version" equals "1.0.0"
+    Then directory "ch/repository/my-skill/1.0.0" exists
+    Then file "ch/repository/my-skill/1.0.0/SKILL.md" exists

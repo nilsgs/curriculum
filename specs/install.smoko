@@ -2,8 +2,6 @@ Feature: cur install saves dependency to .curriculum
   By default, `cur install <name>` records the skill as a dependency in
   .curriculum so the project is reproducible with `cur install` (no args).
 
-  Image: curriculum-test:latest
-
   Background:
     Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
     Given a file "ch/repository/dummy-skill/1.0.0/SKILL.md" with content:
@@ -37,7 +35,8 @@ Feature: cur install saves dependency to .curriculum
       [{"name":"dummy-skill","version":"1.0.0"}]
 
   Scenario: --no-save skips updating .curriculum
-    When I run "sh -c 'cur install dummy-skill --no-save && cur install'"
+    Given I run "cur install dummy-skill --no-save"
+    When I run "cur install"
     Then exit code is 0
     Then output contains "No dependencies declared in .curriculum"
     Then file ".curriculum" as JSON at path "$.dependencies" equals:
@@ -61,3 +60,19 @@ Feature: cur install saves dependency to .curriculum
     When I run "cur install nonexistent-skill"
     Then exit code is not 0
     Then stderr contains "not found in repository"
+
+  Scenario: --global installs into the personal skills directory
+    When I run "cur install dummy-skill --global --json"
+    Then exit code is 0
+    Then output as JSON at path "$.name" equals "dummy-skill"
+    Then output as JSON at path "$.version" equals "1.0.0"
+    Then output as JSON at path "$.destination" equals "/root/.agents/skills/dummy-skill"
+    Then stderr is empty
+
+  Scenario: installs when run from a subdirectory
+    Given the directory "subdir" exists
+    Given the working directory is "subdir"
+    When I run "cur install dummy-skill --no-save --json"
+    Then exit code is 0
+    Then output as JSON at path "$.name" equals "dummy-skill"
+    Then directory "subdir/.agents/skills/dummy-skill" exists

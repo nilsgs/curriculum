@@ -2,8 +2,6 @@ Feature: cur remove updates .curriculum by default
   By default, `cur remove <name>` removes the dependency from .curriculum
   so the manifest stays in sync. Use --no-save to skip the manifest update.
 
-  Image: curriculum-test:latest
-
   Background:
     Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
     Given a file "ch/repository/dummy-skill/1.0.0/SKILL.md" with content:
@@ -39,5 +37,13 @@ Feature: cur remove updates .curriculum by default
 
   Scenario: fails when the skill is not installed
     When I run "cur remove nonexistent-skill"
-    Then exit code is not 0
+    Then exit code is 2
     Then stderr contains "not found"
+
+  Scenario: --global removes from the personal skills directory
+    Given I run "cur install dummy-skill --global"
+    When I run "cur remove dummy-skill --global --json"
+    Then exit code is 0
+    Then output as JSON at path "$.name" equals "dummy-skill"
+    Then output as JSON at path "$.status" equals "removed"
+    Then stderr is empty
