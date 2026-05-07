@@ -3,17 +3,9 @@ set -euo pipefail
 
 INSTALL_DIR="$HOME/.curriculum/bin"
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-VERSION=$(cat "$REPO_DIR/VERSION")
-COMMIT=$(git -C "$REPO_DIR" rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
-echo "Building cur v${VERSION}+${COMMIT}..."
-cd "$REPO_DIR/src"
-go build -ldflags "-s -w -X curriculum/cmd.version=${VERSION} -X curriculum/cmd.commit=${COMMIT}" -o "$REPO_DIR/cur" .
-
-echo "Installing to $INSTALL_DIR..."
-mkdir -p "$INSTALL_DIR"
-mv "$REPO_DIR/cur" "$INSTALL_DIR/cur"
-chmod +x "$INSTALL_DIR/cur"
+sh "$REPO_DIR/scripts/build.sh"
+sh "$REPO_DIR/scripts/install.sh"
 
 # Add to PATH if not already present
 add_to_path() {

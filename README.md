@@ -1,6 +1,6 @@
-# `cur` — Manage Agentic Skills Between Repositories
+# `curriculum` — Manage Agentic Skills Between Repositories
 
-`cur` is a CLI tool for publishing and consuming agentic skills following the [agentskills.io specification](https://agentskills.io/specification). A skill is a reusable agent instruction (SKILL.md + optional scripts/assets) that can be shared across repositories.
+`curriculum` is a CLI tool for publishing and consuming agentic skills following the [agentskills.io specification](https://agentskills.io/specification). A skill is a reusable agent instruction (SKILL.md + optional scripts/assets) that can be shared across repositories.
 
 **Key features:**
 - **Push skills** to a central repository (`~/.curriculum/repository/`)
@@ -484,10 +484,31 @@ cur list | grep skill-name
 
 ## Contributing
 
+Prerequisites for development:
+
+- Go 1.26+
+- Task v3, installed from the official instructions: <https://taskfile.dev/docs/installation>
+- Docker or Podman for `task smoke` and `task ci`
+
+```bash
+task test     # native Go tests
+task build    # build local binary into dist/
+task install  # copy dist/cur to ~/.curriculum/bin
+task smoke    # run Smoko specs; .smokorc builds the test image
+task ci       # run test, build, and smoke
+task cross    # build the full OS/architecture matrix into dist/
+task clean    # remove dist/
+```
+
+Equivalent native Go test command for debugging Task itself:
+
+```bash
+cd src && go test ./... -v -count=1
+```
+
 See `AGENTS.md` for the development workflow.
 
 ---
-
 ## License
 
 See LICENSE file.
