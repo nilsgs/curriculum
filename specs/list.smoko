@@ -1,3 +1,4 @@
+@list
 Feature: cur list shows skills in the central repository
   `cur list` prints all skills and their versions from
   ~/.curriculum/repository/. The latest version is marked with *.
@@ -5,6 +6,7 @@ Feature: cur list shows skills in the central repository
   Background:
     Given environment variable "CURRICULUM_HOME" is set to "/smoko-work/ch"
 
+  @json @repository
   Scenario: shows available skills
     Given a file "ch/repository/my-skill/1.0.0/SKILL.md" with content:
       ---
@@ -18,6 +20,7 @@ Feature: cur list shows skills in the central repository
       ["1.0.0"]
     Then output as JSON at path "$[0].latest" equals "1.0.0"
 
+  @repository
   Scenario: marks the latest version with *
     Given a file "ch/repository/my-skill/1.0.0/SKILL.md" with content:
       ---
@@ -34,6 +37,7 @@ Feature: cur list shows skills in the central repository
     Then output contains "2.0.0 *"
     Then output does not contain "1.0.0 *"
 
+  @json @repository
   Scenario: shows message when repository is empty
     When I run "cur list --json"
     Then exit code is 0

@@ -1,3 +1,4 @@
+@install
 Feature: cur install saves dependency to .curriculum
   By default, `cur install <name>` records the skill as a dependency in
   .curriculum so the project is reproducible with `cur install` (no args).
@@ -16,6 +17,7 @@ Feature: cur install saves dependency to .curriculum
         "dependencies": []
       }
 
+  @dependency @json
   Scenario: named install saves dependency to .curriculum by default
     When I run "cur install dummy-skill --json"
     Then exit code is 0
@@ -25,6 +27,7 @@ Feature: cur install saves dependency to .curriculum
     Then file ".curriculum" as JSON at path "$.dependencies" equals:
       [{"name":"dummy-skill"}]
 
+  @dependency @json @version
   Scenario: named install with explicit version pins that version in .curriculum
     When I run "cur install dummy-skill@1.0.0 --json"
     Then exit code is 0
@@ -34,6 +37,7 @@ Feature: cur install saves dependency to .curriculum
     Then file ".curriculum" as JSON at path "$.dependencies" equals:
       [{"name":"dummy-skill","version":"1.0.0"}]
 
+  @no-save
   Scenario: --no-save skips updating .curriculum
     Given I run "cur install dummy-skill --no-save"
     When I run "cur install"
@@ -42,6 +46,7 @@ Feature: cur install saves dependency to .curriculum
     Then file ".curriculum" as JSON at path "$.dependencies" equals:
       []
 
+  @dependency @json
   Scenario: no-argument install installs all declared dependencies
     Given a file ".curriculum" with content:
       {
@@ -56,11 +61,13 @@ Feature: cur install saves dependency to .curriculum
     Then output as JSON at path "$[0].destination" equals "/smoko-work/.agents/skills/dummy-skill"
     Then the directory ".agents/skills/dummy-skill" exists
 
+  @failure
   Scenario: fails when the skill is not in the repository
     When I run "cur install nonexistent-skill"
     Then exit code is not 0
     Then stderr contains "not found in repository"
 
+  @global @json
   Scenario: --global installs into the personal skills directory
     When I run "cur install dummy-skill --global --json"
     Then exit code is 0
@@ -69,6 +76,7 @@ Feature: cur install saves dependency to .curriculum
     Then output as JSON at path "$.destination" equals "/root/.agents/skills/dummy-skill"
     Then stderr is empty
 
+  @json @workdir
   Scenario: installs when run from a subdirectory
     Given the directory "subdir" exists
     Given the working directory is "subdir"

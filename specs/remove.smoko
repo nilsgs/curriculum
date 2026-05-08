@@ -1,3 +1,4 @@
+@remove
 Feature: cur remove updates .curriculum by default
   By default, `cur remove <name>` removes the dependency from .curriculum
   so the manifest stays in sync. Use --no-save to skip the manifest update.
@@ -21,6 +22,7 @@ Feature: cur remove updates .curriculum by default
       description: "A dummy skill used in tests"
       ---
 
+  @dependency @json
   Scenario: remove deletes dependency from .curriculum by default
     When I run "cur remove dummy-skill --json"
     Then exit code is 0
@@ -29,17 +31,20 @@ Feature: cur remove updates .curriculum by default
     Then file ".curriculum" as JSON at path "$.dependencies" equals:
       []
 
+  @no-save
   Scenario: --no-save keeps the dependency in .curriculum
     When I run "cur remove dummy-skill --no-save"
     Then exit code is 0
     Then file ".curriculum" as JSON at path "$.dependencies[0].name" equals "dummy-skill"
     Then file ".curriculum" as JSON at path "$.dependencies[0].version" equals "1.0.0"
 
+  @failure
   Scenario: fails when the skill is not installed
     When I run "cur remove nonexistent-skill"
     Then exit code is 2
     Then stderr contains "not found"
 
+  @global @json
   Scenario: --global removes from the personal skills directory
     Given I run "cur install dummy-skill --global"
     When I run "cur remove dummy-skill --global --json"

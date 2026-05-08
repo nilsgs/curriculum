@@ -1,3 +1,4 @@
+@init
 Feature: cur init creates a .curriculum manifest
   `cur init` writes a fresh .curriculum file in the current directory.
   It fails if one already exists.
@@ -13,12 +14,14 @@ Feature: cur init creates a .curriculum manifest
     Then file ".curriculum" as JSON at path "$.dependencies" equals:
       []
 
+  @json
   Scenario: creates JSON output when requested
     When I run "cur init --json"
     Then exit code is 0
     Then output as JSON at path "$.version" equals "0.1.0"
     Then output as JSON at path "$.path" exists
 
+  @failure
   Scenario: fails when .curriculum already exists
     Given a file ".curriculum" with content:
       {}
@@ -26,6 +29,7 @@ Feature: cur init creates a .curriculum manifest
     Then exit code is not 0
     Then stderr contains "already initialized"
 
+  @version
   Scenario: prints version with --version flag
     When I run "cur --version"
     Then exit code is 0
