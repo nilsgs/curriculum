@@ -1,3 +1,5 @@
+![Banner](img/banner.png)
+
 # curriculum
 
 curriculum is a CLI for publishing and installing agent skills between
